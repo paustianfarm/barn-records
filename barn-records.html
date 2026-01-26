@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Barn Records</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #1a1d21;
+            --bg-secondary: #252a30;
+            --bg-tertiary: #2d333b;
+            --accent-green: #4ade80;
+            --accent-green-dim: #22c55e;
+            --accent-amber: #fbbf24;
+            --accent-red: #f87171;
+            --accent-blue: #60a5fa;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #374151;
+            --success-bg: rgba(74, 222, 128, 0.15);
+            --warning-bg: rgba(251, 191, 36, 0.15);
+            --error-bg: rgba(248, 113, 113, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background: var(--bg-secondary);
+            padding: 8px 16px 16px;
+            gap: 8px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px 16px;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tab-btn.mortality {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .tab-btn.mortality.active {
+            background: var(--error-bg);
+            color: var(--accent-red);
+        }
+
+        .tab-btn.treatment {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .tab-btn.treatment.active {
+            background: var(--success-bg);
+            color: var(--accent-green);
+        }
+
+        .tab-icon {
+            font-size: 24px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px 16px;
+            overflow-y: auto;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-label.required::after {
+            content: " *";
+            color: var(--accent-red);
+        }
+
+        /* Select Dropdown */
+        .select-wrapper {
+            position: relative;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 16px 48px 16px 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 16px;
+            appearance: none;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--text-muted);
+        }
+
+        /* Text Input */
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 16px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Number Input with Buttons */
+        .number-input-group {
+            display: flex;
+            align-items: stretch;
+            gap: 8px;
+        }
+
+        .number-btn {
+            width: 56px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 24px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .number-btn:active {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+        }
+
+        .number-input-group .form-input {
+            flex: 1;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Radio Button Group */
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .radio-option {
+            position: relative;
+        }
+
+        .radio-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-label {
+            display: block;
+            padding: 14px 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .radio-option input:checked + .radio-label {
+            border-color: var(--accent-green);
+            background: var(--success-bg);
+            color: var(--accent-green);
+        }
+
+        /* Treatment Info Card */
+        .info-card {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-row:first-of-type {
+            padding-top: 0;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .info-value.dosage {
+            color: var(--accent-green);
+            font-size: 20px;
+        }
+
+        .info-value.withdrawal {
+            color: var(--accent-amber);
+        }
+
+        .info-value.route {
+            color: var(--accent-blue);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 18px 24px;
+            border: none;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .submit-btn.mortality-submit {
+            background: linear-gradient(135deg, var(--accent-red) 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .submit-btn.treatment-submit {
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-dim) 100%);
+            color: var(--bg-primary);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-icon {
+            font-size: 24px;
+        }
+
+        .toast-message {
+            font-weight: 600;
+        }
+
+        /* Notes textarea */
+        .form-textarea {
+            width: 100%;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        /* Caretaker Quick Select */
+        .quick-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .quick-select-btn {
+            padding: 10px 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-select-btn.active {
+            border-color: var(--accent-green);
+            background: var(--success-bg);
+            color: var(--accent-green);
+        }
+
+        /* Date Input */
+        input[type="date"] {
+            color-scheme: dark;
+        }
+
+        /* Weight display */
+        .weight-display {
+            text-align: center;
+            padding: 8px 0 4px;
+        }
+
+        .weight-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .weight-unit {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-left: 4px;
+        }
+
+        /* Divider */
+        .section-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 24px 0;
+        }
+
+        /* Records History Toggle */
+        .history-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            margin-top: 24px;
+            background: transparent;
+            border: 1px dashed var(--border-color);
+            border-radius: 12px;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .history-toggle:hover {
+            border-color: var(--text-secondary);
+            color: var(--text-secondary);
+        }
+
+        /* Export Section */
+        .export-section {
+            background: var(--bg-secondary);
+            padding: 20px 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .export-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .export-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .export-btn {
+            flex: 1;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .export-btn:active {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            border-color: var(--accent-green);
+        }
+
+        /* Loading State */
+        .loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* Recent Records */
+        .recent-records {
+            margin-top: 20px;
+        }
+
+        .recent-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .record-item {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .record-item.mortality-record {
+            border-left-color: var(--accent-red);
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .record-location {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .record-date {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .record-details {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="header-title">🐷 Barn Records</h1>
+            <p class="header-subtitle">Mortality & Treatment Recording</p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn mortality active" onclick="switchTab('mortality')">
+                <span class="tab-icon">💀</span>
+                Mortality
+            </button>
+            <button class="tab-btn treatment" onclick="switchTab('treatment')">
+                <span class="tab-icon">💉</span>
+                Treatment
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Mortality Form -->
+            <section id="mortality-section" class="form-section active">
+                <form id="mortality-form">
+                    <div class="form-group">
+                        <label class="form-label required">Date</label>
+                        <input type="date" id="mort-date" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Site</label>
+                        <div class="select-wrapper">
+                            <select id="mort-location" class="form-select" required onchange="updateBarnOptions('mort')">
+                                <option value="">Select site...</option>
+                                <option value="Ralfs">Ralfs</option>
+                                <option value="Mike">Mike</option>
+                                <option value="Stender">Stender</option>
+                                <option value="Allen's Grove">Allen's Grove</option>
+                                <option value="HG Pork">HG Pork</option>
+                                <option value="GDU">GDU</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="mort-barn-group" style="display: none;">
+                        <label class="form-label required">Barn</label>
+                        <div class="select-wrapper">
+                            <select id="mort-barn" class="form-select">
+                                <option value="">Select barn...</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Number of Deaths</label>
+                        <div class="number-input-group">
+                            <button type="button" class="number-btn" onclick="adjustNumber('mort-count', -1)">−</button>
+                            <input type="number" id="mort-count" class="form-input" value="1" min="1" required>
+                            <button type="button" class="number-btn" onclick="adjustNumber('mort-count', 1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Estimated Weight</label>
+                        <div class="weight-display">
+                            <span class="weight-value" id="mort-weight-display">150</span>
+                            <span class="weight-unit">lbs</span>
+                        </div>
+                        <input type="range" id="mort-weight" class="form-input" 
+                               min="10" max="300" value="150" step="5"
+                               oninput="updateMortWeight()"
+                               style="padding: 8px; height: 48px; cursor: pointer;">
+                        <div class="number-input-group" style="margin-top: 10px;">
+                            <button type="button" class="number-btn" onclick="adjustMortWeight(-10)">−10</button>
+                            <input type="number" id="mort-weight-input" class="form-input" value="150" 
+                                   min="10" max="300" oninput="syncMortWeight(this.value)">
+                            <button type="button" class="number-btn" onclick="adjustMortWeight(10)">+10</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Reason</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="mort-reason" id="reason-found" value="Unknown" required>
+                                <label class="radio-label" for="reason-found">Unknown</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="mort-reason" id="reason-respiratory" value="Respiratory">
+                                <label class="radio-label" for="reason-respiratory">Respiratory</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="mort-reason" id="reason-injury" value="Injury/Lame">
+                                <label class="radio-label" for="reason-injury">Injury/Lame</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="mort-reason" id="reason-gut" value="Small/Weak">
+                                <label class="radio-label" for="reason-gut">Small/Weak</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="mort-reason" id="reason-prolapse" value="Prolapse">
+                                <label class="radio-label" for="reason-prolapse">Prolapse</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="mort-reason" id="reason-other" value="Other">
+                                <label class="radio-label" for="reason-other">Other</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Notes (Optional)</label>
+                        <textarea id="mort-notes" class="form-textarea" placeholder="Any additional details..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn mortality-submit">
+                        Record Mortality
+                    </button>
+                </form>
+
+                <div class="recent-records" id="mortality-records">
+                    <h3 class="recent-title">Recent Mortality Records</h3>
+                    <div id="mortality-list"></div>
+                </div>
+            </section>
+
+            <!-- Treatment Form -->
+            <section id="treatment-section" class="form-section">
+                <form id="treatment-form">
+                    <div class="form-group">
+                        <label class="form-label required">Date</label>
+                        <input type="date" id="treat-date" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Site</label>
+                        <div class="select-wrapper">
+                            <select id="treat-location" class="form-select" required onchange="updateBarnOptions('treat')">
+                                <option value="">Select site...</option>
+                                <option value="Ralfs">Ralfs</option>
+                                <option value="Mike">Mike</option>
+                                <option value="Stender">Stender</option>
+                                <option value="Allen's Grove">Allen's Grove</option>
+                                <option value="HG Pork">HG Pork</option>
+                                <option value="GDU">GDU</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="treat-barn-group" style="display: none;">
+                        <label class="form-label required">Barn</label>
+                        <div class="select-wrapper">
+                            <select id="treat-barn" class="form-select">
+                                <option value="">Select barn...</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Product</label>
+                        <div class="select-wrapper">
+                            <select id="treat-product" class="form-select" required onchange="updateTreatmentInfo()">
+                                <option value="">Select medication...</option>
+                                <option value="enrofloxacin">Enrofloxacin (Baytril)</option>
+                                <option value="excede">Excede</option>
+                                <option value="excenel">Excenel</option>
+                                <option value="linco">Linco 100</option>
+                                <option value="nuflor">Nuflor-S</option>
+                                <option value="dexamethasone">Dexamethasone</option>
+                                <option value="amoxicillin">Amoxicillin (water)</option>
+                                <option value="tetracycline">Tetracycline (water)</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Number of Pigs Treated</label>
+                        <div class="number-input-group">
+                            <button type="button" class="number-btn" onclick="adjustNumber('treat-count', -1)">−</button>
+                            <input type="number" id="treat-count" class="form-input" value="1" min="1" required>
+                            <button type="button" class="number-btn" onclick="adjustNumber('treat-count', 1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Estimated Average Weight</label>
+                        <div class="weight-display">
+                            <span class="weight-value" id="weight-display">150</span>
+                            <span class="weight-unit">lbs</span>
+                        </div>
+                        <input type="range" id="treat-weight" class="form-input" 
+                               min="10" max="300" value="150" step="5"
+                               oninput="updateWeight()"
+                               style="padding: 8px; height: 48px; cursor: pointer;">
+                        <div class="number-input-group" style="margin-top: 10px;">
+                            <button type="button" class="number-btn" onclick="adjustWeight(-10)">−10</button>
+                            <input type="number" id="treat-weight-input" class="form-input" value="150" 
+                                   min="10" max="300" oninput="syncWeight(this.value)">
+                            <button type="button" class="number-btn" onclick="adjustWeight(10)">+10</button>
+                        </div>
+                    </div>
+
+                    <!-- Treatment Info Card (Auto-calculated) -->
+                    <div class="info-card" id="treatment-info" style="display: none;">
+                        <h3 class="info-card-title">📋 Treatment Details</h3>
+                        <div class="info-row">
+                            <span class="info-label">Dosage Per Pig</span>
+                            <span class="info-value dosage" id="calc-dosage">--</span>
+                        </div>
+                        <div class="info-row" id="total-dosage-row">
+                            <span class="info-label">Total Dosage (<span id="pig-count-display">1</span> pigs)</span>
+                            <span class="info-value dosage" id="calc-total-dosage">--</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Route</span>
+                            <span class="info-value route" id="calc-route">--</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Withdrawal Period</span>
+                            <span class="info-value withdrawal" id="calc-withdrawal">--</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Withdrawal Date</span>
+                            <span class="info-value" id="calc-withdrawal-date">--</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Administered By</label>
+                        <div class="quick-select" id="caretaker-select">
+                            <!-- Populated by JS - add your caretaker names here -->
+                        </div>
+                        <input type="text" id="treat-caretaker" class="form-input" 
+                               placeholder="Or type name..." style="margin-top: 10px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Notes (Optional)</label>
+                        <textarea id="treat-notes" class="form-textarea" placeholder="Pen number, symptoms, etc..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn treatment-submit">
+                        Confirm & Save Treatment
+                    </button>
+                </form>
+
+                <div class="recent-records" id="treatment-records">
+                    <h3 class="recent-title">Recent Treatment Records</h3>
+                    <div id="treatment-list"></div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Export Section -->
+        <section class="export-section">
+            <h3 class="export-title">Export Data</h3>
+            <div class="export-btns">
+                <button class="export-btn" onclick="exportToCSV('mortality')">
+                    📄 Mortality CSV
+                </button>
+                <button class="export-btn" onclick="exportToCSV('treatment')">
+                    📄 Treatment CSV
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span class="toast-message" id="toast-message">Record saved!</span>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION - Edit these as needed
+        // ============================================
+        
+        // Google Sheets Web App URL
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxLelJhC5pKSA3iGjxkz-_yO28Gt0IduMbsyTHjVUFFJof02d9LZ18MdgRjaWFJ67VI/exec';
+        
+        // Caretaker names for quick selection
+        const CARETAKERS = ['Coy', 'Tom', 'Dennis', 'Amy', 'Mike'];
+        
+        // Medication data
+        const MEDICATIONS = {
+            enrofloxacin: {
+                name: 'Enrofloxacin (Baytril)',
+                activeIngredient: 'Enrofloxacin',
+                dosageRate: 3.4, // mL per 100 lbs
+                dosagePer: 100,
+                route: 'IM (Intramuscular)',
+                withdrawalDays: 5,
+                unit: 'mL'
+            },
+            excede: {
+                name: 'Excede',
+                activeIngredient: 'Ceftiofur Crystalline Free Acid',
+                dosageRate: 1, // mL per 44 lbs
+                dosagePer: 44,
+                route: 'IM (Intramuscular)',
+                withdrawalDays: 14,
+                unit: 'mL'
+            },
+            excenel: {
+                name: 'Excenel',
+                activeIngredient: 'Ceftiofur Hydrochloride',
+                dosageRate: 1, // mL per 22-37 lbs (using 30 as average)
+                dosagePer: 30,
+                route: 'IM (Intramuscular)',
+                withdrawalDays: 4,
+                unit: 'mL',
+                note: '1 mL per 22-37 lbs'
+            },
+            linco: {
+                name: 'Linco 100',
+                activeIngredient: 'Lincomycin',
+                dosageRate: 1, // mL per 20 lbs
+                dosagePer: 20,
+                route: 'IM (Intramuscular)',
+                withdrawalDays: 2,
+                withdrawalText: '48 Hours',
+                unit: 'mL'
+            },
+            nuflor: {
+                name: 'Nuflor-S',
+                activeIngredient: 'Florfenicol',
+                dosageRate: 1, // mL per 45 lbs
+                dosagePer: 45,
+                route: 'IM (Intramuscular)',
+                withdrawalDays: 11,
+                unit: 'mL'
+            },
+            dexamethasone: {
+                name: 'Dexamethasone',
+                activeIngredient: 'Dexamethasone',
+                dosageRate: 1, // mL per 50 lbs
+                dosagePer: 50,
+                route: 'IM (Intramuscular)',
+                withdrawalDays: 4,
+                unit: 'mL'
+            },
+            amoxicillin: {
+                name: 'Amoxicillin (water)',
+                activeIngredient: 'Amoxicillin Trihydrate',
+                dosageRate: 10, // mg per lb
+                dosagePer: 1,
+                route: 'Oral (Water)',
+                withdrawalDays: 3,
+                unit: 'mg',
+                isOral: true
+            },
+            tetracycline: {
+                name: 'Tetracycline (water)',
+                activeIngredient: 'Tetracycline HCl',
+                dosageRate: 10, // mg per lb
+                dosagePer: 1,
+                route: 'Oral (Water)',
+                withdrawalDays: 4,
+                unit: 'mg',
+                isOral: true
+            }
+        };
+
+        // Sites with multiple barns
+        const SITE_BARNS = {
+            'Stender': ['North', 'South'],
+            'Mike': ['North', 'South'],
+            "Allen's Grove": ['1', '2', '3', '4']
+        };
+
+        // ============================================
+        // DATA STORAGE (LocalStorage)
+        // ============================================
+        
+        function getMortalityRecords() {
+            const records = localStorage.getItem('mortalityRecords');
+            return records ? JSON.parse(records) : [];
+        }
+
+        function saveMortalityRecord(record) {
+            const records = getMortalityRecords();
+            record.id = Date.now();
+            record.timestamp = new Date().toISOString();
+            records.unshift(record);
+            localStorage.setItem('mortalityRecords', JSON.stringify(records));
+            
+            // Upload to Google Sheets
+            uploadToGoogleSheets({...record, type: 'mortality'});
+            
+            return record;
+        }
+
+        function getTreatmentRecords() {
+            const records = localStorage.getItem('treatmentRecords');
+            return records ? JSON.parse(records) : [];
+        }
+
+        function saveTreatmentRecord(record) {
+            const records = getTreatmentRecords();
+            record.id = Date.now();
+            record.timestamp = new Date().toISOString();
+            records.unshift(record);
+            localStorage.setItem('treatmentRecords', JSON.stringify(records));
+            
+            // Upload to Google Sheets
+            uploadToGoogleSheets({...record, type: 'treatment'});
+            
+            return record;
+        }
+
+        // ============================================
+        // GOOGLE SHEETS UPLOAD
+        // ============================================
+        
+        async function uploadToGoogleSheets(data) {
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Required for Google Apps Script
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                console.log('Record uploaded to Google Sheets');
+            } catch (error) {
+                console.error('Failed to upload to Google Sheets:', error);
+                // Save to retry queue for later
+                saveToRetryQueue(data);
+                showToast('Saved locally - will sync later');
+            }
+        }
+        
+        function saveToRetryQueue(data) {
+            const queue = JSON.parse(localStorage.getItem('uploadQueue') || '[]');
+            queue.push(data);
+            localStorage.setItem('uploadQueue', JSON.stringify(queue));
+        }
+        
+        async function retryFailedUploads() {
+            const queue = JSON.parse(localStorage.getItem('uploadQueue') || '[]');
+            if (queue.length === 0) return;
+            
+            const failedItems = [];
+            for (const data of queue) {
+                try {
+                    await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+                } catch (error) {
+                    failedItems.push(data);
+                }
+            }
+            localStorage.setItem('uploadQueue', JSON.stringify(failedItems));
+            
+            if (failedItems.length < queue.length) {
+                console.log(`Synced ${queue.length - failedItems.length} records to Google Sheets`);
+            }
+        }
+
+        // ============================================
+        // UI FUNCTIONS
+        // ============================================
+
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.tab-btn.${tab}`).classList.add('active');
+            
+            // Update sections
+            document.querySelectorAll('.form-section').forEach(section => section.classList.remove('active'));
+            document.getElementById(`${tab}-section`).classList.add('active');
+        }
+
+        function updateBarnOptions(prefix) {
+            const location = document.getElementById(`${prefix}-location`).value;
+            const barnGroup = document.getElementById(`${prefix}-barn-group`);
+            const barnSelect = document.getElementById(`${prefix}-barn`);
+            
+            if (SITE_BARNS[location]) {
+                // Show barn selector and populate options
+                barnGroup.style.display = 'block';
+                barnSelect.required = true;
+                barnSelect.innerHTML = '<option value="">Select barn...</option>' + 
+                    SITE_BARNS[location].map(barn => `<option value="${barn}">${barn}</option>`).join('');
+            } else {
+                // Hide barn selector
+                barnGroup.style.display = 'none';
+                barnSelect.required = false;
+                barnSelect.value = '';
+            }
+        }
+
+        function adjustNumber(inputId, delta) {
+            const input = document.getElementById(inputId);
+            const newVal = Math.max(1, parseInt(input.value || 1) + delta);
+            input.value = newVal;
+            // Update treatment info if this is the pig count
+            if (inputId === 'treat-count') {
+                updateTreatmentInfo();
+            }
+        }
+
+        function updateWeight() {
+            const slider = document.getElementById('treat-weight');
+            const display = document.getElementById('weight-display');
+            const input = document.getElementById('treat-weight-input');
+            display.textContent = slider.value;
+            input.value = slider.value;
+            updateTreatmentInfo();
+        }
+
+        function syncWeight(value) {
+            const slider = document.getElementById('treat-weight');
+            const display = document.getElementById('weight-display');
+            const numValue = Math.min(300, Math.max(10, parseInt(value) || 150));
+            slider.value = numValue;
+            display.textContent = numValue;
+            updateTreatmentInfo();
+        }
+
+        function adjustWeight(delta) {
+            const input = document.getElementById('treat-weight-input');
+            const newVal = Math.min(300, Math.max(10, parseInt(input.value || 150) + delta));
+            syncWeight(newVal);
+        }
+
+        function updateMortWeight() {
+            const slider = document.getElementById('mort-weight');
+            const display = document.getElementById('mort-weight-display');
+            const input = document.getElementById('mort-weight-input');
+            display.textContent = slider.value;
+            input.value = slider.value;
+        }
+
+        function syncMortWeight(value) {
+            const slider = document.getElementById('mort-weight');
+            const display = document.getElementById('mort-weight-display');
+            const numValue = Math.min(300, Math.max(10, parseInt(value) || 150));
+            slider.value = numValue;
+            display.textContent = numValue;
+        }
+
+        function adjustMortWeight(delta) {
+            const input = document.getElementById('mort-weight-input');
+            const newVal = Math.min(300, Math.max(10, parseInt(input.value || 150) + delta));
+            syncMortWeight(newVal);
+        }
+
+        function updateTreatmentInfo() {
+            const productId = document.getElementById('treat-product').value;
+            const weight = parseInt(document.getElementById('treat-weight').value) || 150;
+            const pigCount = parseInt(document.getElementById('treat-count').value) || 1;
+            const infoCard = document.getElementById('treatment-info');
+            
+            if (!productId) {
+                infoCard.style.display = 'none';
+                return;
+            }
+            
+            const med = MEDICATIONS[productId];
+            infoCard.style.display = 'block';
+            
+            // Calculate dosage per pig
+            let dosagePerPig;
+            if (med.isOral) {
+                dosagePerPig = (weight * med.dosageRate);
+            } else {
+                dosagePerPig = ((weight / med.dosagePer) * med.dosageRate);
+            }
+            
+            // Calculate total dosage
+            const totalDosage = dosagePerPig * pigCount;
+            
+            document.getElementById('calc-dosage').textContent = `${dosagePerPig.toFixed(1)} ${med.unit}`;
+            document.getElementById('calc-total-dosage').textContent = `${totalDosage.toFixed(1)} ${med.unit}`;
+            document.getElementById('pig-count-display').textContent = pigCount;
+            document.getElementById('calc-route').textContent = med.route;
+            document.getElementById('calc-withdrawal').textContent = 
+                med.withdrawalText || `${med.withdrawalDays} Days`;
+            
+            // Calculate withdrawal date
+            const treatDate = document.getElementById('treat-date').value;
+            if (treatDate) {
+                const withdrawalDate = new Date(treatDate);
+                withdrawalDate.setDate(withdrawalDate.getDate() + med.withdrawalDays);
+                document.getElementById('calc-withdrawal-date').textContent = 
+                    withdrawalDate.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                    });
+            } else {
+                document.getElementById('calc-withdrawal-date').textContent = 'Select date above';
+            }
+        }
+
+        function selectCaretaker(name, btn) {
+            document.getElementById('treat-caretaker').value = name;
+            document.querySelectorAll('.quick-select-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function renderMortalityRecords() {
+            const records = getMortalityRecords().slice(0, 5);
+            const container = document.getElementById('mortality-list');
+            
+            if (records.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <p>No mortality records yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = records.map(record => `
+                <div class="record-item mortality-record">
+                    <div class="record-header">
+                        <span class="record-location">${record.location}${record.barn ? ' - ' + record.barn : ''}</span>
+                        <span class="record-date">${new Date(record.date).toLocaleDateString()}</span>
+                    </div>
+                    <div class="record-details">
+                        ${record.count} death${record.count > 1 ? 's' : ''} — ${record.weight} lbs — ${record.reason}
+                        ${record.notes ? ` — ${record.notes}` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTreatmentRecords() {
+            const records = getTreatmentRecords().slice(0, 5);
+            const container = document.getElementById('treatment-list');
+            
+            if (records.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💉</div>
+                        <p>No treatment records yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = records.map(record => `
+                <div class="record-item">
+                    <div class="record-header">
+                        <span class="record-location">${record.location}${record.barn ? ' - ' + record.barn : ''}</span>
+                        <span class="record-date">${new Date(record.date).toLocaleDateString()}</span>
+                    </div>
+                    <div class="record-details">
+                        ${record.product} — ${record.pigCount || 1} pig${(record.pigCount || 1) > 1 ? 's' : ''} @ ${record.weight} lbs avg
+                        <br>Dosage: ${record.dosagePerPig || record.dosage}/pig${(record.pigCount || 1) > 1 ? ` (${record.totalDosage} total)` : ''}
+                        <br>By: ${record.caretaker} | Withdrawal: ${record.withdrawalDate}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================
+        // EXPORT FUNCTIONS
+        // ============================================
+
+        function exportToCSV(type) {
+            let records, headers, filename;
+            
+            if (type === 'mortality') {
+                records = getMortalityRecords();
+                headers = ['Date', 'Site', 'Barn', 'Count', 'Weight (lbs)', 'Reason', 'Notes', 'Timestamp'];
+                filename = `mortality_records_${new Date().toISOString().split('T')[0]}.csv`;
+                
+                const csvContent = [
+                    headers.join(','),
+                    ...records.map(r => [
+                        r.date,
+                        `"${r.location}"`,
+                        `"${r.barn || ''}"`,
+                        r.count,
+                        r.weight || '',
+                        `"${r.reason}"`,
+                        `"${(r.notes || '').replace(/"/g, '""')}"`,
+                        r.timestamp
+                    ].join(','))
+                ].join('\n');
+                
+                downloadCSV(csvContent, filename);
+            } else {
+                records = getTreatmentRecords();
+                headers = ['Date', 'Site', 'Barn', 'Product', 'Pig Count', 'Avg Weight (lbs)', 'Dosage Per Pig', 'Total Dosage', 'Route', 'Withdrawal Period', 'Withdrawal Date', 'Caretaker', 'Notes', 'Timestamp'];
+                filename = `treatment_records_${new Date().toISOString().split('T')[0]}.csv`;
+                
+                const csvContent = [
+                    headers.join(','),
+                    ...records.map(r => [
+                        r.date,
+                        `"${r.location}"`,
+                        `"${r.barn || ''}"`,
+                        `"${r.product}"`,
+                        r.pigCount || 1,
+                        r.weight,
+                        `"${r.dosagePerPig || r.dosage}"`,
+                        `"${r.totalDosage || r.dosage}"`,
+                        `"${r.route}"`,
+                        `"${r.withdrawal}"`,
+                        r.withdrawalDate,
+                        `"${r.caretaker}"`,
+                        `"${(r.notes || '').replace(/"/g, '""')}"`,
+                        r.timestamp
+                    ].join(','))
+                ].join('\n');
+                
+                downloadCSV(csvContent, filename);
+            }
+            
+            showToast(`${type === 'mortality' ? 'Mortality' : 'Treatment'} CSV downloaded!`);
+        }
+
+        function downloadCSV(content, filename) {
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // ============================================
+        // FORM HANDLERS
+        // ============================================
+
+        document.getElementById('mortality-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const record = {
+                date: document.getElementById('mort-date').value,
+                location: document.getElementById('mort-location').value,
+                barn: document.getElementById('mort-barn').value || '',
+                count: parseInt(document.getElementById('mort-count').value),
+                weight: parseInt(document.getElementById('mort-weight').value),
+                reason: document.querySelector('input[name="mort-reason"]:checked').value,
+                notes: document.getElementById('mort-notes').value.trim()
+            };
+            
+            saveMortalityRecord(record);
+            showToast('Mortality saved & uploaded!');
+            renderMortalityRecords();
+            
+            // Reset form but keep date and location
+            document.getElementById('mort-count').value = 1;
+            document.getElementById('mort-weight').value = 150;
+            document.getElementById('mort-weight-input').value = 150;
+            document.getElementById('mort-weight-display').textContent = 150;
+            document.querySelectorAll('input[name="mort-reason"]').forEach(r => r.checked = false);
+            document.getElementById('mort-notes').value = '';
+            // Reset barn selection
+            document.getElementById('mort-barn').value = '';
+        });
+
+        document.getElementById('treatment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const productId = document.getElementById('treat-product').value;
+            const med = MEDICATIONS[productId];
+            const weight = parseInt(document.getElementById('treat-weight').value);
+            const pigCount = parseInt(document.getElementById('treat-count').value);
+            const treatDate = document.getElementById('treat-date').value;
+            
+            // Calculate dosage per pig
+            let dosagePerPig;
+            if (med.isOral) {
+                dosagePerPig = (weight * med.dosageRate);
+            } else {
+                dosagePerPig = ((weight / med.dosagePer) * med.dosageRate);
+            }
+            
+            // Calculate total dosage
+            const totalDosage = dosagePerPig * pigCount;
+            
+            // Calculate withdrawal date
+            const withdrawalDate = new Date(treatDate);
+            withdrawalDate.setDate(withdrawalDate.getDate() + med.withdrawalDays);
+            
+            const record = {
+                date: treatDate,
+                location: document.getElementById('treat-location').value,
+                barn: document.getElementById('treat-barn').value || '',
+                product: med.name,
+                pigCount: pigCount,
+                weight: weight,
+                dosagePerPig: `${dosagePerPig.toFixed(1)} ${med.unit}`,
+                totalDosage: `${totalDosage.toFixed(1)} ${med.unit}`,
+                route: med.route,
+                withdrawal: med.withdrawalText || `${med.withdrawalDays} Days`,
+                withdrawalDate: withdrawalDate.toISOString().split('T')[0],
+                caretaker: document.getElementById('treat-caretaker').value.trim(),
+                notes: document.getElementById('treat-notes').value.trim()
+            };
+            
+            saveTreatmentRecord(record);
+            showToast('Treatment saved & uploaded!');
+            renderTreatmentRecords();
+            
+            // Reset form but keep date and location
+            document.getElementById('treat-product').value = '';
+            document.getElementById('treat-count').value = 1;
+            document.getElementById('treat-weight').value = 150;
+            document.getElementById('treat-weight-input').value = 150;
+            document.getElementById('weight-display').textContent = 150;
+            document.getElementById('treatment-info').style.display = 'none';
+            document.getElementById('treat-caretaker').value = '';
+            document.getElementById('treat-notes').value = '';
+            document.querySelectorAll('.quick-select-btn').forEach(b => b.classList.remove('active'));
+            // Reset barn selection
+            document.getElementById('treat-barn').value = '';
+        });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        function init() {
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('mort-date').value = today;
+            document.getElementById('treat-date').value = today;
+            
+            // Add date change listener for withdrawal calculation
+            document.getElementById('treat-date').addEventListener('change', updateTreatmentInfo);
+            
+            // Add listener for pig count manual input
+            document.getElementById('treat-count').addEventListener('input', updateTreatmentInfo);
+            
+            // Populate caretaker quick select
+            const caretakerContainer = document.getElementById('caretaker-select');
+            caretakerContainer.innerHTML = CARETAKERS.map(name => 
+                `<button type="button" class="quick-select-btn" onclick="selectCaretaker('${name}', this)">${name}</button>`
+            ).join('');
+            
+            // Render existing records
+            renderMortalityRecords();
+            renderTreatmentRecords();
+            
+            // Retry any failed uploads
+            retryFailedUploads();
+        }
+
+        // Run on load
+        init();
+    </script>
+</body>
+</html>
