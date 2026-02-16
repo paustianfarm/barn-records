@@ -1424,7 +1424,7 @@ input[type="range"] {
                         <span class="record-date">${new Date(record.date).toLocaleDateString()}</span>
                     </div>
                     <div class="record-details">
-                        ${record.count} death${record.count > 1 ? 's' : ''} — ${record.weight} lbs — ${record.reason}
+                        ${record.count} death${record.count > 1 ? 's' : ''} — ${record.weight} lbs avg${record.count > 1 ? ` (${record.count * record.weight} lbs total)` : ''} — ${record.reason}
                         ${record.notes ? ` — ${record.notes}` : ''}
                     </div>
                 </div>
@@ -1469,7 +1469,7 @@ input[type="range"] {
             
             if (type === 'mortality') {
                 records = getMortalityRecords();
-                headers = ['Date', 'Site', 'Barn', 'Count', 'Weight (lbs)', 'Reason', 'Notes', 'Timestamp'];
+                headers = ['Date', 'Site', 'Barn', 'Count', 'Avg Weight (lbs)', 'Total Weight (lbs)', 'Reason', 'Notes', 'Timestamp'];
                 filename = `mortality_records_${new Date().toISOString().split('T')[0]}.csv`;
                 
                 const csvContent = [
@@ -1480,6 +1480,7 @@ input[type="range"] {
                         `"${r.barn || ''}"`,
                         r.count,
                         r.weight || '',
+                        (r.count && r.weight) ? r.count * r.weight : '',
                         `"${r.reason}"`,
                         `"${(r.notes || '').replace(/"/g, '""')}"`,
                         r.timestamp
@@ -1540,6 +1541,7 @@ input[type="range"] {
                 barn: document.getElementById('mort-barn').value || '',
                 count: parseInt(document.getElementById('mort-count').value),
                 weight: parseInt(document.getElementById('mort-weight').value),
+                totalWeight: parseInt(document.getElementById('mort-count').value) * parseInt(document.getElementById('mort-weight').value),
                 reason: document.querySelector('input[name="mort-reason"]:checked').value,
                 notes: document.getElementById('mort-notes').value.trim()
             };
