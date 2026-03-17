@@ -1,0 +1,21 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Editor directories
+.vscode/
+.idea/
+
+# Dependencies (in case they are ever added)
+node_modules/
+
+# Claude
+.claude/
